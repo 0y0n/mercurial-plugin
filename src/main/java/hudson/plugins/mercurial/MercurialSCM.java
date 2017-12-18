@@ -493,9 +493,10 @@ public class MercurialSCM extends SCM implements Serializable {
         try {
         ArgumentListBuilder cmd = hg.seed(true);
         cmd.add("pull");
+        /* To support evolve we must pull all in case a revision has become obsolete
         if (revisionType == RevisionType.BRANCH || revisionType == RevisionType.CHANGESET) { // does not work for tags
             cmd.add("--rev", revision);
-        }
+        }*/
         CachedRepo cachedSource = cachedSource(node, env, launcher, listener, true, credentials);
         if (cachedSource != null) {
             cmd.add(cachedSource.getRepoLocation());
