@@ -208,7 +208,13 @@ class Cache {
                         if (HgExe.joinWithPossibleTimeout(masterHg.bundle(localHeads,bundleFileName).
                                 pwd(masterCache), useTimeout, listener) != 0) {
                             listener.error("Failed to send outgoing changes");
-                            return null;
+                            // oyon: to be robust in case previous head are obsolote and no more in
+                            // master repo try to pull directly from remote
+                            ArgumentListBuilder args = slaveHg.seed(true).add("pull").add(remote);
+                            if (HgExe.joinWithPossibleTimeout(slaveHg.launch(args).pwd(localCache), true, listener) != 0) {
+                                listener.error("Failed to pull "+remote+" from slave ");
+                                return null;
+                            }                                                
                         }
                     }
                 } else {
@@ -229,6 +235,12 @@ class Cache {
                         listener.error("Failed to unbundle " + localTransfer);
                         return null;
                     }
+                    // oyon: temporary workaround to update obsolescence markers with a pull command with remote as source
+                    ArgumentListBuilder args = slaveHg.seed(true).add("pull").add(remote);
+                    if (HgExe.joinWithPossibleTimeout(slaveHg.launch(args).pwd(localCache), true, listener) != 0) {
+                        listener.error("Failed to pull "+remote+" from slave ");
+                        return null;
+                    }                    
                 }
                 } finally {
                     slaveHg.close();
