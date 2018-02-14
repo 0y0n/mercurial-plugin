@@ -500,6 +500,8 @@ public class MercurialSCM extends SCM implements Serializable {
         CachedRepo cachedSource = cachedSource(node, env, launcher, listener, true, credentials);
         if (cachedSource != null) {
             cmd.add(cachedSource.getRepoLocation());
+        }else{
+            cmd.add(getSource(env));
         }
         return HgExe.joinWithPossibleTimeout(
                 hg.launch(cmd).pwd(repository),
@@ -823,9 +825,6 @@ public class MercurialSCM extends SCM implements Serializable {
             }
         } else {
             args.add("clone");
-            if (revisionType == RevisionType.BRANCH || revisionType == RevisionType.CHANGESET) {
-                args.add("--rev", toRevision);
-            }
             args.add("--noupdate");
             args.add(getSource(env));
         }
