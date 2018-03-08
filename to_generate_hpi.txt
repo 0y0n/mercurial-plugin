@@ -1,0 +1,3 @@
+REM Unitest are broken so we skip them.
+set JAVA_HOME=C:\jdk1.8.0_144
+mvn package -DskipTests

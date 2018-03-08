@@ -725,7 +725,8 @@ public class MercurialSCM extends SCM implements Serializable {
 
         int updateExitCode;
         try {
-            updateExitCode = hg.run("update", "--clean", "--rev", toRevision).pwd(repository).join();
+            // OY: add a default path to permit large file update even if bundle have been used to create the cache
+            updateExitCode = hg.run("update", "--clean", "--rev", toRevision,"--config","\"path.default="+getSource(env)+"\"").pwd(repository).join();
         } catch (IOException e) {
             listener.error("Failed to update");
             e.printStackTrace(listener.getLogger());
@@ -865,6 +866,7 @@ public class MercurialSCM extends SCM implements Serializable {
         ArgumentListBuilder upArgs = hg.seed(true);
         upArgs.add("update");
         upArgs.add("--rev", toRevision);
+        upArgs.add("--config", "\"path.default="+getSource(env)+"\""); // OY: add a default path to permit large file update
         if (hg.launch(upArgs).pwd(repository).join() != 0) {
             throw new AbortException("Failed to update " + getSource(env) + " to rev " + toRevision);
         }
